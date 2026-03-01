@@ -153,7 +153,7 @@ Designed to resemble modern security monitoring systems.
 
 Adhvaith Sibu  
 Computer Science Student  
-Cybersecurity & Systems Enthusiast  
+Information Security & Systems Enthusiast  
 
 ---
 
