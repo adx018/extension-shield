@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ex-Shield</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ── SPLASH OVERLAY ── -->
+    <div id="splash">
+        <div id="splash-rings">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+        </div>
+        <svg id="splash-logo" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 3 L38 9.5 L38 22 Q38 33 22 41 Q6 33 6 22 L6 9.5 Z"
+                  fill="rgba(59,130,246,0.12)" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round"
+                  class="splash-shield"/>
+            <polyline points="14,22 20,29 31,16"
+                      stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                      class="splash-check"/>
+        </svg>
+        <div id="splash-label">EX-SHIELD</div>
+        <div id="splash-tagline">Extension Security Scanner</div>
+    </div>
+
+    <!-- ── MAIN UI (hidden until animation ends) ── -->
+    <div id="app" class="app-hidden">
+
+        <div class="header">
+            <div class="logo-wrap">
+                <svg class="logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 3 L38 9.5 L38 22 Q38 33 22 41 Q6 33 6 22 L6 9.5 Z"
+                          fill="rgba(59,130,246,0.12)" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round"/>
+                    <polyline points="14,22 20,29 31,16"
+                              stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>Ex-Shield</h1>
+                <p>Extension Security Scanner</p>
+            </div>
+            <div class="header-badge">
+                <span class="badge-dot"></span>
+                <span>LIVE</span>
+            </div>
+        </div>
+
+        <div class="top-divider"></div>
+
+        <div class="actions">
+            <button id="scanBtn" class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Scan Extensions
+            </button>
+            <button id="exportBtn" class="btn btn-secondary" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export PDF
+            </button>
+        </div>
+
+        <div class="summary">
+            <div class="stat">
+                <span class="stat-num" id="totalCount">--</span>
+                <span class="stat-lbl">Total</span>
+            </div>
+            <div class="stat stat-high">
+                <span class="stat-num" id="highCount">--</span>
+                <span class="stat-lbl">High Risk</span>
+            </div>
+            <div class="stat stat-medium">
+                <span class="stat-num" id="mediumCount">--</span>
+                <span class="stat-lbl">Medium</span>
+            </div>
+            <div class="stat stat-low">
+                <span class="stat-num" id="lowCount">--</span>
+                <span class="stat-lbl">Low</span>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden">
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <span class="progress-label">Scanning extensions...</span>
+        </div>
+
+        <div id="results"></div>
+
+        <div class="footer">Ex-Shield v1.0 &mdash; Extension Risk Monitor</div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+    --bg: #0f1117;
+    --surface: #161b27;
+    --surface2: #1c2333;
+    --border: #252d3d;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.12);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.1);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.1);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    width: 420px;
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    overflow: hidden;
+}
+
+/* ════════════════════════════════════
+   SPLASH SCREEN
+════════════════════════════════════ */
+#splash {
+    position: fixed;
+    inset: 0;
+    width: 420px;
+    /* height fills whatever the popup is during splash */
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    /* Phase 3: whole splash fades out */
+    animation: splash-exit 0.35s ease forwards;
+    animation-delay: 2.4s;
+    animation-fill-mode: both;
+    pointer-events: none;
+}
+
+@keyframes splash-exit {
+    to { opacity: 0; pointer-events: none; visibility: hidden; }
+}
+
+/* Pulse rings behind the logo */
+#splash-rings {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+}
+
+.ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(59,130,246,0.35);
+    animation: ring-expand 2s ease-out infinite;
+}
+.ring-1 { animation-delay: 0s;    }
+.ring-2 { animation-delay: 0.5s;  }
+.ring-3 { animation-delay: 1s;    }
+
+@keyframes ring-expand {
+    0%   { transform: scale(0.6); opacity: 0.8; }
+    100% { transform: scale(2.2); opacity: 0;   }
+}
+
+/* The big centred logo */
+#splash-logo {
+    width: 72px;
+    height: 72px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 18px rgba(59,130,246,0.5));
+    /* Phase 1: draw in */
+    animation: logo-appear 0.4s ease forwards;
+}
+
+@keyframes logo-appear {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1);   }
+}
+
+/* Shield draws itself */
+.splash-shield {
+    stroke-dasharray: 130;
+    stroke-dashoffset: 130;
+    animation: draw-stroke 0.8s ease forwards 0.3s;
+}
+.splash-check {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: draw-stroke 0.45s ease forwards 1s;
+}
+@keyframes draw-stroke { to { stroke-dashoffset: 0; } }
+
+/* Text under the logo */
+#splash-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #fff;
+    margin-top: 18px;
+    opacity: 0;
+    animation: text-fade-in 0.4s ease forwards 1.2s;
+}
+#splash-tagline {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 5px;
+    opacity: 0;
+    animation: text-fade-in 0.4s ease forwards 1.5s;
+}
+@keyframes text-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Phase 2: logo flies to header position before splash fades */
+/* Target: logo-wrap in header is ~16px from left, ~14px from top, 40×40 */
+/* Splash logo is centred at ~(210, ~half viewport), 72px */
+/* We animate it moving up-left and shrinking */
+#splash-logo {
+    transform-origin: center center;
+    animation:
+        logo-appear   0.4s ease         forwards,
+        logo-fly      0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 1.95s;
+}
+
+@keyframes logo-fly {
+    from {
+        transform: scale(1) translate(0, 0);
+        filter: drop-shadow(0 0 18px rgba(59,130,246,0.5));
+    }
+    to {
+        /* move from centre to top-left header position */
+        /* splash logo centre is at (210, ~220). header logo centre is at ~(36, 35) */
+        /* delta: x = -(210-36) = -174,  y = -(220-35) = -185 */
+        /* also scale from 72px down to 40px = 0.556 */
+        transform: scale(0.556) translate(-314px, -334px);
+        filter: drop-shadow(0 0 4px rgba(59,130,246,0.2));
+    }
+}
+
+/* Hide the rings when logo flies (they'd look weird trailing) */
+#splash-logo.flying ~ #splash-rings { display: none; }
+
+/* ════════════════════════════════════
+   MAIN APP
+════════════════════════════════════ */
+#app {
+    /* starts invisible, reveals after splash */
+    opacity: 0;
+    animation: app-reveal 0.4s ease forwards 2.45s;
+}
+@keyframes app-reveal {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.app-hidden { /* just a class hook, animation handles it */ }
+
+/* ── HEADER ── */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: var(--surface);
+    box-shadow: 0 0 18px rgba(59,130,246,0.08);
+}
+
+.logo-svg {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.header-text { flex: 1; }
+.header-text h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+.header-text p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.header-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.8px;
+    background: var(--green-dim);
+    border: 1px solid rgba(34,197,94,0.2);
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+.badge-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+    50%       { opacity: 0.7; box-shadow: 0 0 0 3px rgba(34,197,94,0); }
+}
+
+.top-divider {
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── ACTIONS ── */
+.actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+}
+
+.btn-primary {
+    background: var(--blue);
+    color: #fff;
+    flex: 1;
+    justify-content: center;
+}
+.btn-primary:hover  { background: #2563eb; }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    flex: 1;
+    justify-content: center;
+}
+.btn-secondary:not(:disabled):hover {
+    background: var(--surface);
+    color: var(--text);
+    border-color: #3a4a60;
+}
+.btn-secondary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ── SUMMARY ── */
+.summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 0 16px 14px;
+}
+
+.stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+}
+.stat {
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.stat:hover {
+    transform: translateY(-2px);
+    border-color: var(--blue);
+}
+.stat.active {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 1px var(--blue-dim);
+}
+.stat-num {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--blue);
+    line-height: 1;
+}
+.stat-high   .stat-num { color: var(--red);   }
+.stat-medium .stat-num { color: var(--amber); }
+.stat-low    .stat-num { color: var(--green); }
+
+.stat-lbl {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+/* ── LOADING ── */
+#loading { padding: 0 16px 12px; }
+.progress-bar {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.progress-fill {
+    height: 100%;
+    background: var(--blue);
+    animation: indeterminate 1.4s ease-in-out infinite;
+}
+@keyframes indeterminate {
+    0%   { width: 0%;  margin-left: 0;    }
+    50%  { width: 55%; margin-left: 22%;  }
+    100% { width: 0%;  margin-left: 100%; }
+}
+.progress-label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+}
+
+/* ── RESULTS ── */
+#results {
+    padding: 0 16px;
+    max-height: 380px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+#results::-webkit-scrollbar { width: 4px; }
+#results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── EXTENSION CARD ── */
+.extension-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    animation: slide-in 0.2s ease forwards;
+    opacity: 0;
+    transform: translateY(6px);
+    border-left: 3px solid var(--blue);
+}
+.extension-card.card-high   { border-left-color: var(--red);   }
+.extension-card.card-medium { border-left-color: var(--amber); }
+.extension-card.card-low    { border-left-color: var(--green); }
+
+@keyframes slide-in {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ext-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+}
+
+.risk-badge {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.badge-high   { background: var(--red-dim);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.25);   }
+.badge-medium { background: var(--amber-dim); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+.badge-low    { background: var(--green-dim); color: #86efac; border: 1px solid rgba(34,197,94,0.2);    }
+
+/* ── PERMISSIONS ── */
+.perm-section { margin-top: 6px; }
+.perm-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 5px;
+}
+.perm-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.perm-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--surface2);
+    color: #94a3b8;
+    border: 1px solid var(--border);
+}
+.perm-tag.risky { background: rgba(239,68,68,0.07);   color: #fca5a5; border-color: rgba(239,68,68,0.2);  }
+.perm-tag.warn  { background: rgba(245,158,11,0.07);  color: #fcd34d; border-color: rgba(245,158,11,0.2); }
+.no-perms { font-size: 11px; color: var(--muted); font-style: italic; }
+
+/* ── SCORE BAR ── */
+.score-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.score-bar { flex: 1; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+.fill-high   { background: var(--red);   }
+.fill-medium { background: var(--amber); }
+.fill-low    { background: var(--green); }
+.score-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+/* ── FOOTER ── */
+.footer {
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    padding: 10px 16px 14px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+}
+
+.hidden { display: none; }
+
+/* ── CARD ACTIONS ROW ── */
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* ── DISABLE / ENABLE BUTTON ── */
+.disable-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+    color: #fca5a5;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+.disable-btn:hover {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.55);
+    color: #fff;
+}
+.disable-btn svg { flex-shrink: 0; }
+
+/* Enable state */
+.disable-btn.btn-enable {
+    border-color: rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.08);
+    color: #86efac;
+}
+.disable-btn.btn-enable:hover {
+    background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.55);
+    color: #fff;
+}
+
+/* Greyed out card when disabled */
+.extension-card.card-disabled {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+}
+.extension-card.card-disabled .ext-name {
+    text-decoration: line-through;
+    text-decoration-color: var(--muted);
+}
+.extension-card.card-high {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+}
